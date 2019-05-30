@@ -1,0 +1,13 @@
+#!/bin/bash
+if [ ! -d "dipol" ];then
+	mkdir dipol
+fi
+cp INCAR KPOINTS POSCAR POTCAR CONTCAR vasp.script dipol/
+cd dipol
+if ! grep -Fxq "IDIPOL = 3" INCAR
+then
+	sed -i '2 aIDIPOL = 3' INCAR
+fi
+sed -i 's/nodes=3:ppn=8/nodes=1:ppn=8/g' vasp.script
+mv CONTCAR POSCAR
+printf "Done.\n"

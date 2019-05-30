@@ -1,0 +1,23 @@
+#!/bin/bash
+# -*- coding: utf-8 -*- 
+# Using 'cp CONTCAR POSCAR' rather than 'mv CONTCAT POSCAR' while continue TS searching
+# or this script won't work.
+if [ ! -d "freq" ];then
+        mkdir freq
+fi
+cp INCAR KPOINTS POSCAR POTCAR CONTCAR fort.188 vasp.script freq/
+cd freq
+sed -i 's/^PREC *= *[^ |^;]*/PREC = Accurate /g'   INCAR
+sed -i 's/^ENCUT *= *[^ |^;]*/ENCUT = 500 /g'   INCAR
+sed -i 's/IBRION *= *[^ |^;]*/IBRION = 5/g'   INCAR
+sed -i 's/POTIM *= *[^ |^;]*/POTIM = 0.02/g'   INCAR
+sed -i 's/#*NFREE *= *[^ |^;]*/NFREE = 2 /' INCAR
+sed -i 's/#*NCORE *= *[^ |^;]*/#NCORE = 8 /' INCAR
+# sed -i 's/nodes=3:ppn=8/nodes=1:ppn=8/g' vasp.script
+
+# Change below line to "python YOUR_FILE_PATH"
+python ~/script/freq.py
+
+mv POSCAR1 POSCAR
+rm CONTCAR fort.188
+qsub vasp.script
